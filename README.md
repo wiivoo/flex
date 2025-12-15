@@ -1,73 +1,67 @@
-# React + TypeScript + Vite
+# flex – EV Flex Band Viewer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive visualization of the aggregate charging flexibility of a pool of electric vehicles over a 24‑hour day.
 
-Currently, two official plugins are available:
+You can use it to get an intuition for how the available charging power (kW) of a fleet grows as you add more cars, given a stylized distribution of plug‑in times and session durations.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Live demo
 
-## React Compiler
+The latest version is deployed to GitHub Pages:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- https://wiivoo.github.io/flex/
 
-## Expanding the ESLint configuration
+The repository is private; only the built static site is public.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## What this tool shows
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- A simple **“flex band”** over the day: for each hour, the chart shows the maximum charging power (kW) the EV pool could consume if all plugged‑in cars charged at full power.
+- A **car slider** lets you scale the pool size (e.g. from 100 to 2,000 cars). The band height scales roughly linearly with the number of cars.
+- The shape of the band comes from:
+  - A fixed distribution of **arrival times** (more cars arriving in the evening).
+  - A mix of **session durations** (short, medium, long, very long).
+  - A constant per‑car charging power assumption.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+This is intentionally stylized, not a calibrated model for a specific fleet.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Local development
+
+Requirements:
+
+- Node.js 20+
+- npm
+
+Install dependencies and start the dev server:
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Vite will print a local URL (typically `http://localhost:5173/`). Open it in your browser to use the viewer.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+To build the production bundle:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
 ```
+
+The static files will be generated in the `dist/` directory.
+
+## Deployment
+
+This project uses:
+
+- Vite with `base: '/flex/'` so it can be served from the `/flex/` path on GitHub Pages.
+- A GitHub Actions workflow at `.github/workflows/deploy-pages.yml` that:
+  - Installs dependencies
+  - Builds the app (`npm run build`)
+  - Uploads the `dist/` folder as a Pages artifact
+  - Deploys it to GitHub Pages
+
+Any push to the `main` branch will trigger a new deployment.
+
+## Tech stack
+
+- React 19 + TypeScript
+- Vite
+- Recharts for the area chart
